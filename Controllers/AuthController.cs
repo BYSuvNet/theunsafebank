@@ -31,7 +31,7 @@ public class AuthController : Controller
         {
             // INSECURE: Store identity in a plain cookie
             Response.Cookies.Append("CustomerId", customer.Id.ToString());
-            // HttpContext.Session.SetInt32("CustomerId", customer.Id); // INSECURE: Session-based identity (commented)
+            // HttpContext.Session.SetInt32("CustomerId", customer.Id); // Session-based identity
             return RedirectToAction("Dashboard", "Account");
         }
 
@@ -69,7 +69,7 @@ public class AuthController : Controller
         _context.SaveChanges();
 
         // Generate account number (simple sequential)
-        var accountNumber = (1000000 + customer.Id).ToString();
+        var accountNumber = (1000 + customer.Id).ToString();
 
         // Create account with starting balance
         var account = new Account
@@ -78,6 +78,12 @@ public class AuthController : Controller
             Balance = 10000m, // 10,000 SEK
             CustomerId = customer.Id
         };
+
+        //Every 10th customer gets an extra 10,000 SEK (for testing purposes)
+        if (customer.Id % 10 == 0)
+        {
+            account.Balance += 10000m;
+        }
 
         _context.Accounts.Add(account);
         _context.SaveChanges();

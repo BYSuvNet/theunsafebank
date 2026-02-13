@@ -40,13 +40,13 @@ public class BankContext : DbContext
             Id = 1,
             FullName = "admin",
             Username = "admin",
-            Password = "admin"
+            Password = "password"
         };
 
         var adminAccount = new Account
         {
             Id = 1,
-            AccountNumber = "1000",
+            AccountNumber = "1001",
             Balance = 100000m,
             CustomerId = adminCustomer.Id
         };

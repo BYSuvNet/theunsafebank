@@ -45,7 +45,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Transfer(string toAccountNumber, decimal amount, string receiverMessage, string senderNote)
     {
-        // INSECURE: No CSRF protection, minimal validation
+        // FIXME: No CSRF protection, minimal validation. Fix with [ValidateAntiForgeryToken] and more robust validation logic.
         var customerId = GetCustomerIdFromCookie();
         // var customerId = HttpContext.Session.GetInt32("CustomerId"); // Session-based identity
 
@@ -62,7 +62,7 @@ public class AccountController : Controller
             return RedirectToAction("Dashboard");
         }
 
-        // INSECURE: Minimal validation
+        // FIXME: Minimal validation
         if (amount <= 0)
         {
             TempData["Error"] = "Amount must be positive";
@@ -84,7 +84,7 @@ public class AccountController : Controller
             return RedirectToAction("Dashboard");
         }
 
-        // INSECURE: No transaction, race condition possible
+        // FIXME: No transaction, race condition possible. Fix with a database transaction and row locking.
         if (fromAccount.Balance < amount)
         {
             TempData["Error"] = "Insufficient funds";
@@ -100,8 +100,8 @@ public class AccountController : Controller
             FromAccountId = fromAccount.Id,
             ToAccountId = toAccount.Id,
             Amount = amount,
-            ReceiverMessage = receiverMessage ?? "", // INSECURE: No XSS protection
-            SenderNote = senderNote ?? "", // INSECURE: No XSS protection
+            ReceiverMessage = receiverMessage ?? "", // FIXME: No XSS protection on these two fields. Fix with proper encoding in the view.
+            SenderNote = senderNote ?? "",
             Date = DateTime.Now
         };
 
@@ -110,6 +110,109 @@ public class AccountController : Controller
 
         TempData["Success"] = "Transfer completed successfully";
         return RedirectToAction("Dashboard");
+    }
+
+    [HttpGet]
+    public IActionResult ExportData()
+    {
+        // Show export form - requires username/password for "performative safety"
+        return View();
+    }
+
+    [HttpPost]
+    public IActionResult ExportData(string username, string password)
+    {
+        // VULNERABLE: CRITICAL SQL INJECTION!
+        // User-supplied input directly interpolated into SQL query
+        // Example attack: username = admin' UNION SELECT Id, Username, Password, FullName FROM Customers WHERE '1'='1--
+        try
+        {
+            var exportData = new { customers = new List<dynamic>(), accounts = new List<dynamic>() };
+
+            // Execute raw SQL and extract customer data
+            using (var connection = _context.Database.GetDbConnection())
+            {
+                connection.Open();
+
+                // For demo: query without aliases to avoid column issues
+                var passwordWhere = $"AND Password = '{password}'";
+
+                var sql = $@"
+                    SELECT 
+                        Id, 
+                        Username, 
+                        Password, 
+                        FullName
+                    FROM Customers
+                    WHERE Username = '{username}' {passwordWhere}
+                ";
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = sql;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var customerList = new List<dynamic>();
+                        while (reader.Read())
+                        {
+                            customerList.Add(new
+                            {
+                                Id = reader["Id"],
+                                Username = reader["Username"],
+                                Password = reader["Password"],
+                                FullName = reader["FullName"]
+                            });
+                        }
+
+                        if (!customerList.Any())
+                        {
+                            ViewBag.Error = "Invalid username or password";
+                            return View();
+                        }
+
+                        exportData = new { customers = customerList, accounts = new List<dynamic>() };
+                    }
+                }
+
+                // Also grab account data with vulnerable query
+                var accountSql = $@"
+                    SELECT * FROM Accounts
+                    WHERE CustomerId IN (
+                        SELECT Id FROM Customers 
+                        WHERE Username = '{username}' {passwordWhere}
+                    )
+                ";
+
+                using (var command = connection.CreateCommand())
+                {
+                    command.CommandText = accountSql;
+                    using (var reader = command.ExecuteReader())
+                    {
+                        var accountList = new List<dynamic>();
+                        while (reader.Read())
+                        {
+                            accountList.Add(new
+                            {
+                                Id = reader["Id"],
+                                AccountNumber = reader["AccountNumber"],
+                                Balance = reader["Balance"],
+                                CustomerId = reader["CustomerId"]
+                            });
+                        }
+                        exportData = new { exportData.customers, accounts = accountList };
+                    }
+                }
+            }
+
+            // Return as JSON download
+            var json = System.Text.Json.JsonSerializer.Serialize(exportData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
+            return File(System.Text.Encoding.UTF8.GetBytes(json), "application/json", $"bank_export_{DateTime.Now:yyyyMMdd_HHmmss}.json");
+        }
+        catch (Exception ex)
+        {
+            ViewBag.Error = $"Export failed: {ex.Message}";
+            return View();
+        }
     }
 
     private int? GetCustomerIdFromCookie()

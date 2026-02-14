@@ -1,0 +1,41 @@
+@{
+    ViewData["Title"] = "Export Data";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2>Export din data!</h2>
+            <p class="text-muted">Som den ansvarsfulla bank vi är låter vi dig här ladda ner all din data vi har om dig!
+                Berätta gärna för dina vänner om Suverän Bank!</p>
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger" role="alert">
+                        @ViewBag.Error
+                    </div>
+                }
+
+                <form method="post" class="card p-4 border-danger">
+                    <div class="alert alert-warning" role="alert">
+                        <strong>Obs:</strong> För din säkerhets skull behöver du skriva in ditt namn och lösenord igen för
+                        att ladda ner din känsliga data som vi vaktar väldigt noga! Vi på Suverän Bank tar din integritet
+                        och säkerhet på största allvar!
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="username" class="form-label">Användarnamn</label>
+                        <input type="text" id="username" name="username" class="form-control" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Lösenord</label>
+                        <input type="password" id="password" name="password" class="form-control" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">Ladda ner</button>
+                    <a href="@Url.Action("Dashboard", "Account")" class="btn btn-secondary w-100 mt-2">Cancel</a>
+                </form>
+            </div>
+        </div>
+    </div>

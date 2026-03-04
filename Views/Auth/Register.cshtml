@@ -12,7 +12,7 @@
         <p style="color: red;"><b>@ViewBag.Error</b></p>
     }
 
-    <form method="post" action="/Auth/Register">
+    <form method="post" asp-controller="Auth" asp-action="Register">
         <table border="0" cellpadding="5">
             <tr>
                 <td align="right"><b>Full Name:</b></td>
@@ -35,6 +35,6 @@
     </form>
 
     <p>
-        <a href="/Auth/Login">Already have an account? Login here!</a>
+        <a asp-controller="Auth" asp-action="Login">Already have an account? Login here!</a>
     </p>
 </center>

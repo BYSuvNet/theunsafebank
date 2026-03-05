@@ -1,11 +1,11 @@
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Registrera";
 }
 
 <center>
-    <h2>UnsafeBank Online Registration</h2>
-    <h3>Open Your New Account Today!</h3>
-    <p><i>Get 10,000 SEK when you sign up!</i></p>
+    <h2>Suverän Bank</h2>
+    <h3>Bli kund idag!</h3>
+    <p><i>Få 10,000 SEK när du registrerar dig!</i></p>
 
     @if (ViewBag.Error != null)
     {
@@ -15,15 +15,15 @@
     <form method="post" asp-controller="Auth" asp-action="Register">
         <table border="0" cellpadding="5">
             <tr>
-                <td align="right"><b>Full Name:</b></td>
+                <td align="right"><b>Ditt namn:</b></td>
                 <td><input type="text" name="fullName" size="30" /></td>
             </tr>
             <tr>
-                <td align="right"><b>Username:</b></td>
+                <td align="right"><b>Användarnamn:</b></td>
                 <td><input type="text" name="username" size="30" /></td>
             </tr>
             <tr>
-                <td align="right"><b>Password:</b></td>
+                <td align="right"><b>Lösenord:</b></td>
                 <td><input type="password" name="password" size="30" /></td>
             </tr>
             <tr>
@@ -35,6 +35,6 @@
     </form>
 
     <p>
-        <a asp-controller="Auth" asp-action="Login">Already have an account? Login here!</a>
+        <a asp-controller="Auth" asp-action="Login">Redan kund? Logga in här!</a>
     </p>
 </center>

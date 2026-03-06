@@ -40,7 +40,8 @@ public class BankContext : DbContext
             Id = 1,
             FullName = "Admin",
             Username = "admin",
-            Password = "admin" // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
+            Password = "admin", // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
+            CustomerNumber = "adminNumber123"
         };
 
         var theBanksAccount = new Account
@@ -56,7 +57,8 @@ public class BankContext : DbContext
             Id = 2,
             FullName = "gustav",
             Username = "gus",
-            Password = "gus"
+            Password = "gus",
+            CustomerNumber = "gustavNumber123"
         };
 
         var firstCustomerAccount = new Account
@@ -72,7 +74,8 @@ public class BankContext : DbContext
             Id = 3,
             FullName = "kråkan",
             Username = "kråkan",
-            Password = "kråkan"
+            Password = "kråkan",
+            CustomerNumber = "kråkanNumber123"
         };
 
         var secondCustomerAccount = new Account

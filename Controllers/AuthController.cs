@@ -52,23 +52,20 @@ public class AuthController : Controller
             ViewBag.Error = "Username already exists";
             return View();
         }
-        string numFirstHalf = "dK-JoNaS";
-        string numSecHalf = Random.Shared.Next(900000000, 1000000000).ToString();
-
-        string customerNumber = numFirstHalf + numSecHalf;
 
         var customer = new Customer
         {
             Username = username,
             Password = password,
             FullName = fullName,
-            CustomerNumber = customerNumber
         };
 
         _context.Customers.Add(customer);
         _context.SaveChanges();
 
-        var accountNumber = (1000 + customer.Id).ToString();
+        string identifier = "dK-JoNaS-";
+        string rndNumber = Random.Shared.Next(900000000, 1000000000).ToString();
+        string accountNumber = identifier + rndNumber;
 
         var account = new Account
         {
@@ -85,7 +82,7 @@ public class AuthController : Controller
         _context.Accounts.Add(account);
         _context.SaveChanges();
 
-        Response.Cookies.Append("dkJoNaS", customer.CustomerNumber.ToString());
+        Response.Cookies.Append("CustomerId", customer.Id.ToString());
         return RedirectToAction("Dashboard", "Account");
     }
 

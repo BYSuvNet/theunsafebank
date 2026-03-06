@@ -35,62 +35,63 @@ public class BankContext : DbContext
 
         // Seed an admin customer with name admin and password admin.
         // Also add an account for that customer with 100,000SEK.
-        // var adminCustomer = new Customer
-        // {
-        //     Id = 1,
-        //     FullName = "Admin",
-        //     Username = "admin",
-        //     Password = "admin", // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
-        //     CustomerNumber = "adminNumber123"
-        // };
+        string identifier = "dK-JoNaS-";
+        string rndNumber = Random.Shared.Next(900000000, 1000000000).ToString();
+        string accountNumber = identifier + rndNumber;
 
-        // var theBanksAccount = new Account
-        // {
-        //     Id = 1,
-        //     AccountNumber = "1001",
-        //     Balance = 100000m,
-        //     CustomerId = adminCustomer.Id
-        // };
+        var adminCustomer = new Customer
+        {
+            Id = 1,
+            FullName = "Admin",
+            Username = "admin",
+            Password = "admin", // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
+        };
 
-        // var firstCustomer = new Customer
-        // {
-        //     Id = 2,
-        //     FullName = "gustav",
-        //     Username = "gus",
-        //     Password = "gus",
-        //     CustomerNumber = "gustavNumber123"
-        // };
+        var theBanksAccount = new Account
+        {
+            Id = 1,
+            AccountNumber = accountNumber,
+            Balance = 100000m,
+            CustomerId = adminCustomer.Id
+        };
 
-        // var firstCustomerAccount = new Account
-        // {
-        //     Id = 2,
-        //     AccountNumber = "1002",
-        //     Balance = 10000m,
-        //     CustomerId = firstCustomer.Id
-        // };
+        var firstCustomer = new Customer
+        {
+            Id = 2,
+            FullName = "gustav",
+            Username = "gus",
+            Password = "gus",
+        };
 
-        // var secondCustomer = new Customer
-        // {
-        //     Id = 3,
-        //     FullName = "kråkan",
-        //     Username = "kråkan",
-        //     Password = "kråkan",
-        //     CustomerNumber = "kråkanNumber123"
-        // };
+        var firstCustomerAccount = new Account
+        {
+            Id = 2,
+            AccountNumber = accountNumber,
+            Balance = 10000m,
+            CustomerId = firstCustomer.Id
+        };
 
-        // var secondCustomerAccount = new Account
-        // {
-        //     Id = 3,
-        //     AccountNumber = "1003",
-        //     Balance = 10000m,
-        //     CustomerId = secondCustomer.Id
-        // };
+        var secondCustomer = new Customer
+        {
+            Id = 3,
+            FullName = "kråkan",
+            Username = "kråkan",
+            Password = "kråkan",
+        };
 
-        // modelBuilder.Entity<Customer>().HasData(adminCustomer);
-        // modelBuilder.Entity<Account>().HasData(theBanksAccount);
-        // modelBuilder.Entity<Customer>().HasData(firstCustomer);
-        // modelBuilder.Entity<Account>().HasData(firstCustomerAccount);
-        // modelBuilder.Entity<Customer>().HasData(secondCustomer);
-        // modelBuilder.Entity<Account>().HasData(secondCustomerAccount);
+        var secondCustomerAccount = new Account
+        {
+            Id = 3,
+            AccountNumber = accountNumber,
+            Balance = 10000m,
+            CustomerId = secondCustomer.Id
+        };
+
+        modelBuilder.Entity<Customer>().HasData(adminCustomer);
+        modelBuilder.Entity<Account>().HasData(theBanksAccount);
+        modelBuilder.Entity<Customer>().HasData(firstCustomer);
+        modelBuilder.Entity<Account>().HasData(firstCustomerAccount);
+        modelBuilder.Entity<Customer>().HasData(secondCustomer);
+        modelBuilder.Entity<Account>().HasData(secondCustomerAccount);
     }
 }

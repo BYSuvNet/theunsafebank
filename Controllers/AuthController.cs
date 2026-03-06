@@ -25,12 +25,18 @@ public class AuthController : Controller
     
     [HttpPost]
     public IActionResult Login(string username, string password )
-    {
-        int failedAttempts = _context.LoginAttempts.Where(l => l.Username == username && l.IsSuccess == false).Count();
 
-          if(failedAttempts > 3)
+    { 
+        DateTime oneMinuteAgo = DateTime.Now.AddMinutes(-1);
+        int failedAttempts = _context.LoginAttempts
+        .Where(l => l.Username == username && l.IsSuccess == false && l.LoginTime >= oneMinuteAgo)
+        .Count();
+
+       
+          if(failedAttempts >= 2)
         {
-            ViewBag.Error = "Du har slut på försök. Kontakta kundtjänst eller försök senare.";
+
+            ViewBag.Error = "Du har slut på försök. Kontakta kundtjänst eller försök om 1 minut.";
             return View();
         }
 

@@ -66,10 +66,9 @@ public class AuthController : Controller
 			CustomerNumber = customerNumber
 		};
 
-		_context.Customers.Add(customer);
-		_context.SaveChanges();
-
-		var accountNumber = (1000 + customer.Id).ToString();
+		string identifier = "dK-JoNaS-";
+		string rndNumber = Random.Shared.Next(900000000, 1000000000).ToString();
+		string accountNumber = identifier + rndNumber;
 
 		var account = new Account
 		{
@@ -85,7 +84,6 @@ public class AuthController : Controller
 
 		_context.Accounts.Add(account);
 		_context.SaveChanges();
-
 		Response.Cookies.Append("CustomerId", customer.Id.ToString());
 		return RedirectToAction("Dashboard", "Account");
 	}

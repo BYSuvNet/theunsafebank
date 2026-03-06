@@ -24,7 +24,7 @@ public class AuthController : Controller
     public IActionResult Login(string username, string password)
     {
         var customer = _context.Customers
-            .FirstOrDefault(c => c.Username == username && c.Password == password);
+            .FirstOrDefault(c => c.Username == username && c.PasswordHased == password);
 
         if (customer != null)
         {
@@ -80,7 +80,7 @@ public class AuthController : Controller
         var customer = new Customer
         {
             Username = username,
-            Password = password,
+            PasswordHased = password,
             FullName = fullName
         };
 

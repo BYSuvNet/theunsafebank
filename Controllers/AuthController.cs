@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using theunsafebank.Data;
 using theunsafebank.Models;
 
@@ -21,12 +20,32 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public IActionResult Login(string username, string password)
+    public IActionResult Login(string username, string password )
+
     {
+        DateTime oneMinuteAgo = DateTime.Now.AddMinutes(-1);
+        int failedAttempts = _context.LoginAttempts
+        .Where(l => l.Username == username && l.IsSuccess == false && l.LoginTime >= oneMinuteAgo)
+        .Count();
+
+        if (failedAttempts >= 2)
+        {
+            ViewBag.Error = "Du har slut på försök. Kontakta kundtjänst eller försök om 1 minut.";
+            return View();
+        }
         var customer = _context.Customers
             .FirstOrDefault(c => c.Username == username && c.Password == password);
 
-        if (customer != null)
+          var Logaiattempts = new LoginAttempt
+        {
+            Username = username,
+            IsSuccess = customer != null 
+        };
+
+        _context.LoginAttempts.Add(Logaiattempts);
+        _context.SaveChanges();
+
+        if (customer != null )
         {
             HttpContext.Session.SetString("customerId", customer.Id.ToString());
             return RedirectToAction("Dashboard", "Account");

@@ -57,7 +57,7 @@ public class AuthController : Controller
 
 		if (customerNumber == null)
 		{
-			ViewBag.Error = "Gick ej generera kundnummer, var god försök igen.";
+			ViewBag.Error = "Misslyckades att generera kundnummer, var god försök igen.";
 			return View();
 		}
 

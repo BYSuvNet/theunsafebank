@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using theunsafebank.Data;
 using theunsafebank.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace theunsafebank.Controllers;
 
@@ -16,7 +17,7 @@ public class AccountController : Controller
 
     public IActionResult Dashboard()
     {
-        var customerId = GetCustomerIdFromCookie();
+        var customerId = GetCustomerIdFromSession();
 
         if (customerId == null)
         {
@@ -43,7 +44,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Transfer(string toAccountNumber, decimal amount, string receiverMessage, string senderNote)
     {
-        var customerId = GetCustomerIdFromCookie();
+        var customerId = GetCustomerIdFromSession();
 
         if (customerId == null)
         {
@@ -215,8 +216,6 @@ public class AccountController : Controller
         // Returnera json som filnedladdning
         var json = System.Text.Json.JsonSerializer.Serialize(exportData, new System.Text.Json.JsonSerializerOptions { WriteIndented = true });
         return File(System.Text.Encoding.UTF8.GetBytes(json), "application/json", $"bank_export_{DateTime.Now:yyyyMMdd_HHmmss}.json");
-
-
     }
 
     [HttpGet]
@@ -234,14 +233,15 @@ public class AccountController : Controller
         return Json(new { success = true, name = account.Customer.FullName });
     }
 
-    private int? GetCustomerIdFromCookie()
+    private int? GetCustomerIdFromSession()
     {
-        if (Request.Cookies.TryGetValue("CustomerId", out var rawValue)
-            && int.TryParse(rawValue, out var customerId))
-        {
-            return customerId;
-        }
+        // if (Request.Cookies.TryGetValue("CustomerId", out var rawValue)
+        //     && int.TryParse(rawValue, out var customerId))
+        // {
+        //     return customerId;
+        // }
 
-        return null;
+        return HttpContext.Session.GetInt32("customerId");
+
     }
 }

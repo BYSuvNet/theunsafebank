@@ -23,15 +23,12 @@ public class AuthController : Controller
     [HttpPost]
     public IActionResult Login(string username, string password)
     {
-        // FIXME: SQL Injection vulnerable, plain text password comparison. Fix with hashed passwords.
         var customer = _context.Customers
             .FirstOrDefault(c => c.Username == username && c.Password == password);
 
         if (customer != null)
         {
-            // FIXME: Store identity in a plain cookie
             Response.Cookies.Append("CustomerId", customer.Id.ToString());
-            // HttpContext.Session.SetInt32("CustomerId", customer.Id); // Session-based identity
             return RedirectToAction("Dashboard", "Account");
         }
 
@@ -48,7 +45,6 @@ public class AuthController : Controller
     [HttpPost]
     public IActionResult Register(string username, string password, string fullName)
     {
-        // FIXME: No validation, no password hashing
         var existingCustomer = _context.Customers.FirstOrDefault(c => c.Username == username);
 
         if (existingCustomer != null)
@@ -57,21 +53,18 @@ public class AuthController : Controller
             return View();
         }
 
-        // Create customer with plain text password
         var customer = new Customer
         {
             Username = username,
-            Password = password, // FIXME: Plain text! Use Bcrypt to hash passwords in a real application
+            Password = password,
             FullName = fullName
         };
 
         _context.Customers.Add(customer);
         _context.SaveChanges();
 
-        // Generate account number (simple sequential)
         var accountNumber = (1000 + customer.Id).ToString();
 
-        // Create account with starting balance
         var account = new Account
         {
             AccountNumber = accountNumber,
@@ -79,7 +72,6 @@ public class AuthController : Controller
             CustomerId = customer.Id
         };
 
-        //Every 10th customer gets an extra 10,000 SEK (for testing purposes)
         if (customer.Id % 10 == 0)
         {
             account.Balance += 10000m;
@@ -88,18 +80,13 @@ public class AuthController : Controller
         _context.Accounts.Add(account);
         _context.SaveChanges();
 
-        // Auto-login after registration (plain cookie - INSECURE)
         Response.Cookies.Append("CustomerId", customer.Id.ToString());
-        // HttpContext.Session.SetInt32("CustomerId", customer.Id); // FIXME: Session-based identity (commented)
-
         return RedirectToAction("Dashboard", "Account");
     }
 
     public IActionResult Logout()
     {
-        // Clear the plain cookie
         Response.Cookies.Delete("CustomerId");
-        // HttpContext.Session.Clear(); // FIXME: Session-based identity (commented)
         return RedirectToAction("Login");
     }
 }

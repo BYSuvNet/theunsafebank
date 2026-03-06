@@ -16,9 +16,7 @@ public class AccountController : Controller
 
     public IActionResult Dashboard()
     {
-        // INSECURE
         var customerId = GetCustomerIdFromCookie();
-        // var customerId = HttpContext.Session.GetInt32("CustomerId"); // Session-based identity
 
         if (customerId == null)
         {
@@ -45,9 +43,7 @@ public class AccountController : Controller
     [HttpPost]
     public IActionResult Transfer(string toAccountNumber, decimal amount, string receiverMessage, string senderNote)
     {
-        // FIXME: No CSRF protection, minimal validation. Fix with [ValidateAntiForgeryToken] and more robust validation logic.
         var customerId = GetCustomerIdFromCookie();
-        // var customerId = HttpContext.Session.GetInt32("CustomerId"); // Session-based identity
 
         if (customerId == null)
         {
@@ -111,7 +107,7 @@ public class AccountController : Controller
             FromAccount = fromAccount,
             ToAccount = toAccount,
             Amount = amount,
-            ReceiverMessage = receiverMessage, // FIXME: No XSS protection on these two fields. Fix with proper encoding in the view.
+            ReceiverMessage = receiverMessage,
             SenderNote = senderNote,
             Date = DateTime.Now
         };
@@ -140,17 +136,14 @@ public class AccountController : Controller
         }
 
         // VULNERABLE: CRITICAL SQL INJECTION!
-        // User-supplied input directly interpolated into SQL query
         // Example attack: username = ' OR 1=1 -- 
 
         var exportData = new { customers = new List<dynamic>(), accounts = new List<dynamic>() };
 
-        // Execute raw SQL and extract customer data
         using (var connection = _context.Database.GetDbConnection())
         {
             connection.Open();
 
-            // For demo: query without aliases to avoid column issues
             var passwordWhere = $"AND Password = '{password}'";
 
             var sql = $@"

@@ -11,7 +11,7 @@ using theunsafebank.Data;
 namespace theunsafebank.Migrations
 {
     [DbContext(typeof(BankContext))]
-    [Migration("20260306114527_AddLoginAttempts")]
+    [Migration("20260306120948_AddLoginAttempts")]
     partial class AddLoginAttempts
     {
         /// <inheritdoc />
@@ -130,7 +130,7 @@ namespace theunsafebank.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoginAttempt");
+                    b.ToTable("LoginAttempts");
                 });
 
             modelBuilder.Entity("theunsafebank.Models.Transfer", b =>

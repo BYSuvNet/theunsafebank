@@ -24,9 +24,9 @@ public class AuthController : Controller
     }
     
     [HttpPost]
-    public IActionResult Login(string username, string password)
+    public IActionResult Login(string username, string password )
     {
-        int failedAttempts = _context.LoginAttempt.Where(l => l.Username == username && l.IsSuccess == false).Count();
+        int failedAttempts = _context.LoginAttempts.Where(l => l.Username == username && l.IsSuccess == false).Count();
 
           if(failedAttempts > 3)
         {
@@ -42,7 +42,15 @@ public class AuthController : Controller
             Response.Cookies.Append("CustomerId", customer.Id.ToString());
             return RedirectToAction("Dashboard", "Account");
         }
+
+        var Logaiattempts = new LoginAttempt
+        {
+            Username = username,
+            IsSuccess = customer != null
+        };
         
+        _context.LoginAttempts.Add(Logaiattempts);
+        _context.SaveChanges();
       
         
         ViewBag.Error = "Invalid username or password";

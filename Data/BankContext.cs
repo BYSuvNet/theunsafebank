@@ -12,7 +12,7 @@ public class BankContext : DbContext
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Account> Accounts { get; set; }
     public DbSet<Transfer> Transfers { get; set; }
-    public DbSet<LoginAttempt> LoginAttempt { get; set; }
+    public DbSet<LoginAttempt> LoginAttempts { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

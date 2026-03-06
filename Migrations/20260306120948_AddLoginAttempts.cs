@@ -29,7 +29,7 @@ namespace theunsafebank.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "LoginAttempt",
+                name: "LoginAttempts",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
@@ -40,7 +40,7 @@ namespace theunsafebank.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LoginAttempt", x => x.Id);
+                    table.PrimaryKey("PK_LoginAttempts", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -135,7 +135,7 @@ namespace theunsafebank.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "LoginAttempt");
+                name: "LoginAttempts");
 
             migrationBuilder.DropTable(
                 name: "Transfers");

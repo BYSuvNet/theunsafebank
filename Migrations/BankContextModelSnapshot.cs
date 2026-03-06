@@ -127,7 +127,7 @@ namespace theunsafebank.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("LoginAttempt");
+                    b.ToTable("LoginAttempts");
                 });
 
             modelBuilder.Entity("theunsafebank.Models.Transfer", b =>

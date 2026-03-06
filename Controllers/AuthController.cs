@@ -34,7 +34,7 @@ public class AuthController : Controller
             return View();
         }
         var customer = _context.Customers
-            .FirstOrDefault(c => c.Username == username && c.Password == password);
+            .FirstOrDefault(c => c.Username == username && c.PasswordHased == password);
 
           var Logaiattempts = new LoginAttempt
         {
@@ -99,7 +99,7 @@ public class AuthController : Controller
         var customer = new Customer
         {
             Username = username,
-            Password = password,
+            PasswordHased = password,
             FullName = fullName
         };
 

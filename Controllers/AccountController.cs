@@ -235,13 +235,6 @@ public class AccountController : Controller
 
     private int? GetCustomerIdFromSession()
     {
-        // if (Request.Cookies.TryGetValue("CustomerId", out var rawValue)
-        //     && int.TryParse(rawValue, out var customerId))
-        // {
-        //     return customerId;
-        // }
-
         return HttpContext.Session.GetInt32("customerId");
-
     }
 }

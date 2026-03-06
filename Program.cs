@@ -8,11 +8,10 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<BankContext>(options =>
     options.UseSqlite("Data Source=bank.db"));
 
-// Add session support (insecure - no encryption, just basic storage)
-builder.Services.AddDistributedMemoryCache(); // In-memory cache for sessions
+builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
-    options.Cookie.HttpOnly = true; // INSECURE!
+    options.Cookie.HttpOnly = true;
     options.Cookie.IsEssential = true;
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     options.IdleTimeout = TimeSpan.FromMinutes(10);
@@ -39,7 +38,7 @@ using (var scope = app.Services.CreateScope())
 app.UsePathBase("/bank"); //Eftersom siten servas under suvnet.se/bank
 
 app.UseRouting();
-app.UseSession(); // FIXME: Session is not properly configured, and not used in controllers
+app.UseSession();
 app.UseAuthorization();
 
 app.MapStaticAssets();

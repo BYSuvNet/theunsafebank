@@ -53,6 +53,35 @@ public class AuthController : Controller
             return View();
         }
 
+        // Password längd
+        if (password.Length < 8)
+        {
+            ViewBag.Error = "Lösenordet måste vara 8 tecken lång";
+            return View();
+        }
+
+        // Password Specialtecken och siffror
+        if (!password.Any(char.IsNumber) && !password.Any(char.IsSymbol))
+        {
+            ViewBag.Error = "Lösenordet måste innehålla siffror och specialtecken";
+            return View();
+        }
+
+        // Password Stor bokstav 
+
+        if (!password.Any(char.IsUpper))
+        {
+            ViewBag.Error = "Lösenordet måste innehålla Storbokstav";
+            return View();
+        }
+
+        // Password samma som användarnamn
+        if (password == username)
+        {
+            ViewBag.Error = "Lösenorder får inte vara samma som användarnamn";
+            return View();
+        }
+
         var customer = new Customer
         {
             Username = username,

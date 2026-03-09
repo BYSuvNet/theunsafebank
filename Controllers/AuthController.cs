@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using theunsafebank.Data;
 using theunsafebank.Models;
 
@@ -22,13 +21,33 @@ public class AuthController : Controller
 
     [HttpPost]
     public IActionResult Login(string username, string password)
+
     {
+        DateTime oneMinuteAgo = DateTime.Now.AddMinutes(-1);
+        int failedAttempts = _context.LoginAttempts
+        .Where(l => l.Username == username && l.IsSuccess == false && l.LoginTime >= oneMinuteAgo)
+        .Count();
+
+        if (failedAttempts >= 2)
+        {
+            ViewBag.Error = "Du har slut på försök. Kontakta kundtjänst eller försök om 1 minut.";
+            return View();
+        }
         var customer = _context.Customers
             .FirstOrDefault(c => c.Username == username && c.Password == password);
 
+        var Logaiattempts = new LoginAttempt
+        {
+            Username = username,
+            IsSuccess = customer != null
+        };
+
+        _context.LoginAttempts.Add(Logaiattempts);
+        _context.SaveChanges();
+
         if (customer != null)
         {
-            Response.Cookies.Append("CustomerId", customer.Id.ToString());
+            HttpContext.Session.SetString("customerId", customer.Id.ToString());
             return RedirectToAction("Dashboard", "Account");
         }
 
@@ -58,6 +77,30 @@ public class AuthController : Controller
         if (customerNumber == null)
         {
             ViewBag.Error = "Misslyckades att generera kundnummer, var god försök igen.";
+            return View();
+        }
+
+        if (password.Length < 8)
+        {
+            ViewBag.Error = "Lösenordet måste vara 8 tecken långt";
+            return View();
+        }
+
+        if (!password.Any(char.IsNumber) && !password.Any(char.IsSymbol))
+        {
+            ViewBag.Error = "Lösenordet måste innehålla siffror och specialtecken";
+            return View();
+        }
+
+        if (!password.Any(char.IsUpper))
+        {
+            ViewBag.Error = "Lösenordet måste innehålla storbokstav";
+            return View();
+        }
+
+        if (password == username)
+        {
+            ViewBag.Error = "Lösenordet får inte vara samma som användarnamn";
             return View();
         }
 
@@ -93,7 +136,8 @@ public class AuthController : Controller
 
         _context.Accounts.Add(account);
         _context.SaveChanges();
-        Response.Cookies.Append("CustomerId", customer.Id.ToString());
+
+        HttpContext.Session.SetString("customerId", customer.Id.ToString());
         return RedirectToAction("Dashboard", "Account");
     }
 
@@ -104,7 +148,7 @@ public class AuthController : Controller
 
         while (attempts < maxAttempts)
         {
-            BankNumberGenerator.GenerateAccountNumber();
+            string accountNum = BankNumberGenerator.GenerateAccountNumber();
             if (!_context.Accounts.Any(a => a.AccountNumber == accountNum))
             {
                 return accountNum;
@@ -115,7 +159,7 @@ public class AuthController : Controller
     }
     public IActionResult Logout()
     {
-        Response.Cookies.Delete("CustomerId");
+        HttpContext.Session.Remove("customerId");
         return RedirectToAction("Login");
     }
 
@@ -126,7 +170,7 @@ public class AuthController : Controller
 
         while (attempts < maxAttempts)
         {
-            BankNumberGenerator.GenerateCustomerNumber();
+            string customerNumber = BankNumberGenerator.GenerateCustomerNumber();
             if (!_context.Customers.Any(c => c.CustomerNumber == customerNumber))
             {
                 return customerNumber;

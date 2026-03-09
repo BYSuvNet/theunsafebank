@@ -1,27 +1,27 @@
 @model theunsafebank.Models.Account
 @{
-	ViewData["Title"] = "Ditt konto";
+    ViewData["Title"] = "Ditt konto";
 }
 
 <center>
-	<h2>Välkommen, @Model.Customer.FullName!</h2>
-	<h3>Kundnr: @Model.Customer.CustomerNumber</h3>
-	<p><a asp-controller="Auth" asp-action="Logout">Logga ut</a></p>
-	<p><a asp-controller="Account" asp-action="ExportData">Dataexport</a></p>
+    <h2>Välkommen, @Model.Customer.FullName!</h2>
+    <h3>Kundnr: @Model.Customer.CustomerNumber</h3>
+    <p><a asp-controller="Auth" asp-action="Logout">Logga ut</a></p>
+    <p><a asp-controller="Account" asp-action="ExportData">Dataexport</a></p>
 </center>
 
 <hr>
 
 <h3>Ditt konto</h3>
 <table border="1" cellpadding="10" cellspacing="0" width="100%">
-	<tr bgcolor="#cccccc">
-		<td><b>Kontonummer</b></td>
-		<td><b>Saldo</b></td>
-	</tr>
-	<tr>
-		<td>@Model.AccountNumber</td>
-		<td><b>@Model.Balance.ToString("N2") SEK</b></td>
-	</tr>
+    <tr bgcolor="#cccccc">
+        <td><b>Kontonummer</b></td>
+        <td><b>Saldo</b></td>
+    </tr>
+    <tr>
+        <td>@Model.AccountNumber</td>
+        <td><b>@Model.Balance.ToString("N2") SEK</b></td>
+    </tr>
 </table>
 
 <hr>
@@ -30,45 +30,45 @@
 
 @if (TempData["Error"] != null)
 {
-	<p style="color: red;"><b>Fel: @TempData["Error"]</b></p>
+    <p style="color: red;"><b>Fel: @TempData["Error"]</b></p>
 }
 
 @if (TempData["Success"] != null)
 {
-	<p style="color: green;"><b>@TempData["Success"]</b></p>
+    <p style="color: green;"><b>@TempData["Success"]</b></p>
 }
 
 <form method="post" asp-controller="Account" asp-action="Transfer">
-	<table border="0" cellpadding="5">
-		<tr>
-			<td><b>Till konto:</b></td>
-			<td>
-				<input type="text" name="toAccountNumber" id="toAccountNumber" size="30" />
-				<input type="button" value="Hämta namn" onclick="lookupAccount()" />
-			</td>
-		</tr>
-		<tr>
-			<td><b>Kontoinnehavare:</b></td>
-			<td><input type="text" id="accountHolderName" size="30" readonly style="background-color: #eee;" /></td>
-		</tr>
-		<tr>
-			<td><b>Summa (SEK):</b></td>
-			<td><input type="text" name="amount" size="30" /></td>
-		</tr>
-		<tr>
-			<td><b>Meddelande till mottagaren:</b></td>
-			<td><input type="text" name="receiverMessage" size="30" /></td>
-		</tr>
-		<tr>
-			<td><b>Meddelande till dig:</b></td>
-			<td><input type="text" name="senderNote" size="30" /></td>
-		</tr>
-		<tr>
-			<td colspan="2">
-				<input type="submit" value="Send Transfer" />
-			</td>
-		</tr>
-	</table>
+    <table border="0" cellpadding="5">
+        <tr>
+            <td><b>Till konto:</b></td>
+            <td>
+                <input type="text" name="toAccountNumber" id="toAccountNumber" size="30" />
+                <input type="button" value="Hämta namn" onclick="lookupAccount()" />
+            </td>
+        </tr>
+        <tr>
+            <td><b>Kontoinnehavare:</b></td>
+            <td><input type="text" id="accountHolderName" size="30" readonly style="background-color: #eee;" /></td>
+        </tr>
+        <tr>
+            <td><b>Summa (SEK):</b></td>
+            <td><input type="text" name="amount" size="30" /></td>
+        </tr>
+        <tr>
+            <td><b>Meddelande till mottagaren:</b></td>
+            <td><input type="text" name="receiverMessage" size="30" /></td>
+        </tr>
+        <tr>
+            <td><b>Meddelande till dig:</b></td>
+            <td><input type="text" name="senderNote" size="30" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" value="Send Transfer" />
+            </td>
+        </tr>
+    </table>
 </form>
 
 <hr>
@@ -76,80 +76,80 @@
 <h3>Transaktionshistorik</h3>
 
 @{
-	var allTransfers = Model.TransfersFrom
-		.Select(t => new
-		{
-			Date = t.Date,
-			Type = "Sent",
-			Account = t.ToAccount.AccountNumber,
-			Amount = -t.Amount,
-			Message =
+    var allTransfers = Model.TransfersFrom
+        .Select(t => new
+        {
+            Date = t.Date,
+            Type = "Sent",
+            Account = t.ToAccount.AccountNumber,
+            Amount = -t.Amount,
+            Message =
 t.SenderNote
-		})
-		.Concat(Model.TransfersTo
-			.Select(t => new
-			{
-				Date = t.Date,
-				Type = "Received",
-				Account = t.FromAccount.AccountNumber,
-				Amount = t.Amount,
-				Message =
+        })
+        .Concat(Model.TransfersTo
+            .Select(t => new
+            {
+                Date = t.Date,
+                Type = "Received",
+                Account = t.FromAccount.AccountNumber,
+                Amount = t.Amount,
+                Message =
 t.ReceiverMessage
-			}))
-		.OrderByDescending(t => t.Date)
-		.ToList();
+            }))
+        .OrderByDescending(t => t.Date)
+        .ToList();
 }
 
 @if (allTransfers.Any())
 {
-	<table border="1" cellpadding="5" cellspacing="0" width="100%">
-		<tr bgcolor="#cccccc">
-			<td><b>Datum</b></td>
-			<td><b>Typ</b></td>
-			<td><b>Konto</b></td>
-			<td><b>Summa</b></td>
-			<td><b>Meddelande</b></td>
-		</tr>
-		@foreach (var transfer in allTransfers)
-		{
-			<tr>
-				<td>@transfer.Date.ToString("yyyy-MM-dd HH:mm:ss")</td>
-				<td>@transfer.Type</td>
-				<td>@transfer.Account</td>
-				<td style="color: @(transfer.Amount > 0 ? "green" : "red")">
-					@transfer.Amount.ToString("N2") SEK
-				</td>
-				<td>@Html.Raw(transfer.Message)</td>
-			</tr>
-		}
-	</table>
+    <table border="1" cellpadding="5" cellspacing="0" width="100%">
+        <tr bgcolor="#cccccc">
+            <td><b>Datum</b></td>
+            <td><b>Typ</b></td>
+            <td><b>Konto</b></td>
+            <td><b>Summa</b></td>
+            <td><b>Meddelande</b></td>
+        </tr>
+        @foreach (var transfer in allTransfers)
+        {
+            <tr>
+                <td>@transfer.Date.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                <td>@transfer.Type</td>
+                <td>@transfer.Account</td>
+                <td style="color: @(transfer.Amount > 0 ? "green" : "red")">
+                    @transfer.Amount.ToString("N2") SEK
+                </td>
+                <td>@transfer.Message</td>
+            </tr>
+        }
+    </table>
 }
 else
 {
-	<p><i>Inga överföringar än. Kom igen!</i></p>
+    <p><i>Inga överföringar än. Kom igen!</i></p>
 }
 
 <script>
-	function lookupAccount() {
-		var accountNumber = document.getElementById('toAccountNumber').value;
-		var nameField = document.getElementById('accountHolderName');
-		nameField.value = '';
+    function lookupAccount() {
+        var accountNumber = document.getElementById('toAccountNumber').value;
+        var nameField = document.getElementById('accountHolderName');
+        nameField.value = '';
 
-		if (!accountNumber) {
-			nameField.value = '';
-			return;
-		}
+        if (!accountNumber) {
+            nameField.value = '';
+            return;
+        }
 
-		fetch('@Url.Action("LookupAccount", "Account")?accountNumber=' + encodeURIComponent(accountNumber))
-			.then(function (response) { return response.json(); })
-			.then(function (data) {
-				if (data.success) {
-					nameField.value = data.name;
-					nameField.style.color = 'black';
-				} else {
-					nameField.value = data.message;
-					nameField.style.color = 'red';
-				}
-			});
-	}
+        fetch('@Url.Action("LookupAccount", "Account")?accountNumber=' + encodeURIComponent(accountNumber))
+            .then(function (response) { return response.json(); })
+            .then(function (data) {
+                if (data.success) {
+                    nameField.value = data.name;
+                    nameField.style.color = 'black';
+                } else {
+                    nameField.value = data.message;
+                    nameField.style.color = 'red';
+                }
+            });
+    }
 </script>

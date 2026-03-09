@@ -24,9 +24,9 @@ public class AuthController : Controller
     public IActionResult Login(string username, string password)
     {
         var customer = _context.Customers
-            .FirstOrDefault(c => c.Username == username && c.PasswordHased == password);
+            .FirstOrDefault(c => c.Username == username);
 
-        if (customer != null)
+        if (customer != null && BCrypt.Net.BCrypt.Verify(password, customer.PasswordHashed))
         {
             Response.Cookies.Append("CustomerId", customer.Id.ToString());
             return RedirectToAction("Dashboard", "Account");
@@ -35,6 +35,7 @@ public class AuthController : Controller
         ViewBag.Error = "Invalid username or password";
         return View();
     }
+
 
     [HttpGet]
     public IActionResult Register()
@@ -53,25 +54,27 @@ public class AuthController : Controller
             return View();
         }
 
-        if (password.Length < 8)
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
+
+        if (hashedPassword.Length < 8)
         {
             ViewBag.Error = "Lösenordet måste vara 8 tecken långt";
             return View();
         }
 
-        if (!password.Any(char.IsNumber) && !password.Any(char.IsSymbol))
+        if (!hashedPassword.Any(char.IsNumber) && !hashedPassword.Any(char.IsSymbol))
         {
             ViewBag.Error = "Lösenordet måste innehålla siffror och specialtecken";
             return View();
         }
 
-        if (!password.Any(char.IsUpper))
+        if (!hashedPassword.Any(char.IsUpper))
         {
             ViewBag.Error = "Lösenordet måste innehålla storbokstav";
             return View();
         }
 
-        if (password == username)
+        if (hashedPassword == username)
         {
             ViewBag.Error = "Lösenordet får inte vara samma som användarnamn";
             return View();
@@ -80,7 +83,7 @@ public class AuthController : Controller
         var customer = new Customer
         {
             Username = username,
-            PasswordHased = password,
+            PasswordHashed = hashedPassword,
             FullName = fullName
         };
 

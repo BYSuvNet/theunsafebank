@@ -20,7 +20,7 @@ public class AuthController : Controller
     }
 
     [HttpPost]
-    public IActionResult Login(string username, string password )
+    public IActionResult Login(string username, string password)
 
     {
         DateTime oneMinuteAgo = DateTime.Now.AddMinutes(-1);
@@ -36,16 +36,16 @@ public class AuthController : Controller
         var customer = _context.Customers
             .FirstOrDefault(c => c.Username == username && c.Password == password);
 
-          var Logaiattempts = new LoginAttempt
+        var Logaiattempts = new LoginAttempt
         {
             Username = username,
-            IsSuccess = customer != null 
+            IsSuccess = customer != null
         };
 
         _context.LoginAttempts.Add(Logaiattempts);
         _context.SaveChanges();
 
-        if (customer != null )
+        if (customer != null)
         {
             HttpContext.Session.SetString("customerId", customer.Id.ToString());
             return RedirectToAction("Dashboard", "Account");
@@ -69,6 +69,14 @@ public class AuthController : Controller
         if (existingCustomer != null)
         {
             ViewBag.Error = "Username already exists";
+            return View();
+        }
+
+        string? customerNumber = SetCustomerNumber();
+
+        if (customerNumber == null)
+        {
+            ViewBag.Error = "Misslyckades att generera kundnummer, var god försök igen.";
             return View();
         }
 
@@ -100,13 +108,19 @@ public class AuthController : Controller
         {
             Username = username,
             Password = password,
-            FullName = fullName
+            FullName = fullName,
+            CustomerNumber = customerNumber
         };
 
         _context.Customers.Add(customer);
         _context.SaveChanges();
 
-        var accountNumber = (1000 + customer.Id).ToString();
+        string? accountNumber = CheckDuplicateAccNumber();
+        if (accountNumber is null)
+        {
+            ViewBag.Error = "Banken är full!";
+            return View();
+        }
 
         var account = new Account
         {
@@ -127,9 +141,44 @@ public class AuthController : Controller
         return RedirectToAction("Dashboard", "Account");
     }
 
+    private string? CheckDuplicateAccNumber()
+    {
+        int maxAttempts = 25;
+        int attempts = 0;
+
+        while (attempts < maxAttempts)
+        {
+            string accountNum = BankNumberGenerator.GenerateAccountNumber();
+            if (!_context.Accounts.Any(a => a.AccountNumber == accountNum))
+            {
+                return accountNum;
+            }
+            attempts++;
+        }
+        return null;
+    }
     public IActionResult Logout()
     {
         HttpContext.Session.Remove("customerId");
         return RedirectToAction("Login");
+    }
+
+    public string? SetCustomerNumber()
+    {
+        int maxAttempts = 25;
+        int attempts = 0;
+
+        while (attempts < maxAttempts)
+        {
+            string customerNumber = BankNumberGenerator.GenerateCustomerNumber();
+            if (!_context.Customers.Any(c => c.CustomerNumber == customerNumber))
+            {
+                return customerNumber;
+            }
+
+            attempts++;
+        }
+
+        return null;
     }
 }

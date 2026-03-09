@@ -5,6 +5,7 @@
 
 <center>
     <h2>Välkommen, @Model.Customer.FullName!</h2>
+    <h3>Kundnr: @Model.Customer.CustomerNumber</h3>
     <p><a asp-controller="Auth" asp-action="Logout">Logga ut</a></p>
     <p><a asp-controller="Account" asp-action="ExportData">Dataexport</a></p>
 </center>

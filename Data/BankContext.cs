@@ -36,18 +36,20 @@ public class BankContext : DbContext
 
         // Seed an admin customer with name admin and password admin.
         // Also add an account for that customer with 100,000SEK.
+
         var adminCustomer = new Customer
         {
             Id = 1,
             FullName = "Admin",
             Username = "admin",
-            Password = "admin" // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
+            Password = "admin", // FIXME: Plain text password! Use Bcrypt to hash passwords in a real application
+            CustomerNumber = BankNumberGenerator.GenerateCustomerNumber()
         };
 
         var theBanksAccount = new Account
         {
             Id = 1,
-            AccountNumber = "1001",
+            AccountNumber = BankNumberGenerator.GenerateAccountNumber(),
             Balance = 100000m,
             CustomerId = adminCustomer.Id
         };
@@ -57,13 +59,14 @@ public class BankContext : DbContext
             Id = 2,
             FullName = "gustav",
             Username = "gus",
-            Password = "gus"
+            Password = "gus",
+            CustomerNumber = BankNumberGenerator.GenerateCustomerNumber()
         };
 
         var firstCustomerAccount = new Account
         {
             Id = 2,
-            AccountNumber = "1002",
+            AccountNumber = BankNumberGenerator.GenerateAccountNumber(),
             Balance = 10000m,
             CustomerId = firstCustomer.Id
         };
@@ -73,13 +76,14 @@ public class BankContext : DbContext
             Id = 3,
             FullName = "kråkan",
             Username = "kråkan",
-            Password = "kråkan"
+            Password = "kråkan",
+            CustomerNumber = BankNumberGenerator.GenerateCustomerNumber()
         };
 
         var secondCustomerAccount = new Account
         {
             Id = 3,
-            AccountNumber = "1003",
+            AccountNumber = BankNumberGenerator.GenerateAccountNumber(),
             Balance = 10000m,
             CustomerId = secondCustomer.Id
         };

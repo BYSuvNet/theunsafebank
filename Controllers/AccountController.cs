@@ -57,7 +57,6 @@ public class AccountController : Controller
         {
             return RedirectToAction("Dashboard");
         }
-
         // FIXME: Minimal validation
         if (amount <= 0)
         {

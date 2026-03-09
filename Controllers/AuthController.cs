@@ -54,31 +54,32 @@ public class AuthController : Controller
             return View();
         }
 
-        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
-        if (hashedPassword.Length < 8)
+        if (password.Length < 8)
         {
             ViewBag.Error = "Lösenordet måste vara 8 tecken långt";
             return View();
         }
 
-        if (!hashedPassword.Any(char.IsNumber) && !hashedPassword.Any(char.IsSymbol))
+        if (!password.Any(char.IsNumber) && !password.Any(char.IsSymbol))
         {
             ViewBag.Error = "Lösenordet måste innehålla siffror och specialtecken";
             return View();
         }
 
-        if (!hashedPassword.Any(char.IsUpper))
+        if (!password.Any(char.IsUpper))
         {
             ViewBag.Error = "Lösenordet måste innehålla storbokstav";
             return View();
         }
 
-        if (hashedPassword == username)
+        if (password == username)
         {
             ViewBag.Error = "Lösenordet får inte vara samma som användarnamn";
             return View();
         }
+
+        string hashedPassword = BCrypt.Net.BCrypt.HashPassword(password);
 
         var customer = new Customer
         {
